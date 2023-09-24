@@ -37,7 +37,7 @@ func createTaskHandler(c *gin.Context) {
 }
 
 func main() {
-	router := gin.Default()
+	router := gin.Default() // u can also use gin.New(), but middleware will not be used
 
 	router.POST("/tasks/", createTaskHandler)
 	router.GET("/tasks/", func(ctx *gin.Context) {})
