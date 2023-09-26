@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "grpc-basics/";
+
+service ProductInfo {
+    rpc addProduct (Product) returns (ProductID);
+}
+
+message Product {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message ProductID {
+    string value = 1;
+}
+ 
