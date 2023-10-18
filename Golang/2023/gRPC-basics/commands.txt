@@ -1,0 +1,1 @@
+protoc --go_out=pkg/api --go_opt=paths=import --go-grpc_out=pkg/api --go-grpc_opt=paths=import api/myservice.proto
