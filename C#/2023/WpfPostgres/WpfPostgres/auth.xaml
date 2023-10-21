@@ -22,6 +22,10 @@
 
         <ScrollViewer Grid.RowSpan="2" Margin="0,0,0,72">
             <Grid DataContext="{Binding Product}">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
                 <ItemsControl
                     Grid.Row="0"
                     Margin="20,20,0,0"
@@ -37,6 +41,10 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
+                <TextBlock
+                    Grid.Row="1"
+                    FontSize="30"
+                    Text="{Binding SomeString}" />
             </Grid>
         </ScrollViewer>
         <Grid Grid.Row="1" DataContext="{Binding Buttons}">
