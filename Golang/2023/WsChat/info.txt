@@ -1,0 +1,2 @@
+https://github.com/gorilla/websocket/blob/main/examples/chat/client.go#L41
+https://golangdocs.com/golang-gorilla-websockets
