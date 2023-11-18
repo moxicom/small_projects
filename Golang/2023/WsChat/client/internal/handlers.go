@@ -6,8 +6,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func ReceivingHandler(connection *websocket.Conn, done *chan interface{}) {
-	defer close(*done)
+func receiveHandler(connection *websocket.Conn, done chan interface{}) {
+	defer close(done)
 	for {
 		_, msg, err := connection.ReadMessage()
 		if err != nil {

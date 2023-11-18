@@ -1,13 +1,12 @@
 package main
 
 import (
-	"WsChat/server/internal/service"
+	"WsChat/server/internal/handlers"
 	"log"
 	"net/http"
 )
 
 func main() {
-	http.HandleFunc("/start", service.SocketHandler)
-	http.HandleFunc("/", service.GoHome)
+	http.HandleFunc("/start", handlers.SocketHandler)
 	log.Fatal(http.ListenAndServe("localhost:8080", nil))
 }

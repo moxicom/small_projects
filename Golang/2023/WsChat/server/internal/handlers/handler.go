@@ -1,4 +1,4 @@
-package service
+package handlers
 
 import (
 	"log"
@@ -7,20 +7,19 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{} // use default options
+var upgrader = websocket.Upgrader{} // оставим без изменений
 var connections = []*websocket.Conn{}
 
 func SocketHandler(w http.ResponseWriter, r *http.Request) {
-	// Upgrade our raw HTTP connection to a websocket based one
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("Error during connection upgradation:", err)
 		return
 	}
 	defer conn.Close()
+
 	connections = append(connections, conn)
-	log.Println(connections)
-	// The event loop
+
 	for {
 		messageType, message, err := conn.ReadMessage()
 		if err != nil {

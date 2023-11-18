@@ -19,8 +19,6 @@ func main() {
 	}
 	defer conn.Close()
 
-	go internal.ReceivingHandler(conn, &done)
-
 	internal.ClearScreen()
 	internal.RunChat(conn, done)
 }

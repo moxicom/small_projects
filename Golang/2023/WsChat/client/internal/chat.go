@@ -19,11 +19,7 @@ func userInput(inputChan chan string) {
 	inputChan <- msg
 }
 
-func RunChat(conn *websocket.Conn, done chan interface{}) {
-
-	interrupt = make(chan os.Signal)
-	signal.Notify(interrupt, os.Interrupt)
-
+func chatInputHandler(conn *websocket.Conn, done chan interface{}) {
 	for {
 		inputChan := make(chan string)
 		go userInput(inputChan)
@@ -40,10 +36,8 @@ func RunChat(conn *websocket.Conn, done chan interface{}) {
 			PrintColoredText("message has been sent", "\033[32m")
 
 		case <-interrupt:
-			// We received a SIGINT (Ctrl + C). Terminate gracefully...
-			log.Println("Received SIGINT interrupt signal. Closing all pending connections")
+			log.Println("Interrupt signal received. Closing all pending connections")
 
-			// Close our websocket connection
 			err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
 				log.Println("Error during closing websocket:", err)
@@ -52,11 +46,20 @@ func RunChat(conn *websocket.Conn, done chan interface{}) {
 
 			select {
 			case <-done:
-				log.Println("Receiver Channel Closed! Exiting....")
+				log.Println("Receiver Channel Closed")
 			case <-time.After(time.Duration(1) * time.Second):
-				log.Println("Timeout in closing receiving channel. Exiting....")
+				log.Println("Timeout in closing receiving channel")
 			}
 			return
 		}
 	}
+}
+
+func RunChat(conn *websocket.Conn, done chan interface{}) {
+	go receiveHandler(conn, done)
+
+	interrupt = make(chan os.Signal)
+	signal.Notify(interrupt, os.Interrupt)
+
+	chatInputHandler(conn, done)
 }
