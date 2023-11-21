@@ -14,7 +14,7 @@ const (
 	writeWait = 10 * time.Second
 
 	// Time allowed to read the next pong message from the peer.
-	pongWait = 60 * time.Second
+	pongWait = 5 * time.Second
 
 	// Send pings to peer with this period. Must be less than pongWait.
 	pingPeriod = (pongWait * 9) / 10
@@ -45,7 +45,11 @@ func (c *Client) readPump() {
 	}()
 	c.con.SetReadLimit(maxMessageSize)
 	c.con.SetReadDeadline(time.Now().Add(pongWait))
-	c.con.SetPongHandler(func(string) error { c.con.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.con.SetPongHandler(func(string) error {
+		c.con.SetReadDeadline(time.Now().Add(pongWait))
+		log.Println(" <- PONG")
+		return nil
+	})
 	for {
 		_, message, err := c.con.ReadMessage()
 		if err != nil {
@@ -90,6 +94,7 @@ func (c *Client) writePump() {
 				return
 			}
 		case <-ticker.C:
+			log.Println("PING ->")
 			c.con.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.con.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
