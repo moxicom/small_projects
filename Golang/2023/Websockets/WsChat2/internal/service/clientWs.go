@@ -20,7 +20,6 @@ func NewClient(con *websocket.Conn, send chan []byte) *ClientCon {
 func (c *ClientCon) ReceiveMessage() {
 	con := c.con
 	defer con.Close()
-	c.con.SetReadDeadline(time.Now().Add(pongWait * 11 / 10))
 	con.SetPingHandler(
 		func(appData string) error {
 			// fmt.Println()

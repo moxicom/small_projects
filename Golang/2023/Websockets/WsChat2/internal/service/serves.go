@@ -36,6 +36,8 @@ type Client struct {
 
 	// Buffered channel of outbound messages
 	send chan []byte
+
+	username string
 }
 
 func (c *Client) readPump() {
@@ -59,6 +61,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, []byte{'\n'}, []byte{' '}, -1))
+		message = []byte(c.username + ": " + string(message))
 		c.hub.broadcast <- message
 	}
 }
@@ -104,12 +107,13 @@ func (c *Client) writePump() {
 }
 
 func ServeWs(h *Hub, w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
 	con, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: h, con: con, send: make(chan []byte, 256)}
+	client := &Client{hub: h, con: con, send: make(chan []byte, 256), username: username}
 	client.hub.register <- client
 
 	go client.writePump()
