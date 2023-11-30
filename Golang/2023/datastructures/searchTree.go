@@ -139,3 +139,15 @@ func printInOrderRec(node *searchTreeNode) {
 		printInOrderRec(node.right)
 	}
 }
+
+func (t *searchTree) DeleteTree() {
+	deleteTree(t.head)
+}
+
+func deleteTree(node *searchTreeNode) {
+	if node == nil {
+		return
+	}
+	deleteTree(node.left)
+	deleteTree(node.right)
+}
