@@ -8,19 +8,22 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @title Your API Title
-// @version 1.0
-// @description Your API description
-// @host localhost:8080
-// @BasePath /
+// @title			Your API Title
+// @version		1.0
+// @description	Your API description
+// @host			localhost:8080
+// @BasePath		/
+
+type Handler struct {
+}
+
 func main() {
 	r := gin.Default()
 
-	// Swagger documentation route
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	h := Handler{}
 
-	// Your API routes
-	// e.g., r.GET("/users", getUsers)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	r.GET("/users", h.GetUsers)
 
 	r.Run(":8080")
 }
