@@ -30,7 +30,7 @@ export default function FetchPage() {
     return (
       <div className="flex justify-center pt-8 content-center">
         <div className="w-2/3">
-          <h1 className="font-sans font-bold text-xl text-center">
+          <h1 className="text-4xl font-black text-gray-900 text-center">
             Welcome to fetch page
           </h1>
           <GetDataForm onSubmit={buttonClicked} />
