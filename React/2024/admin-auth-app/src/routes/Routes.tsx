@@ -1,56 +1,29 @@
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  createBrowserRouter,
-} from "react-router-dom";
-import { AppPage } from "../pages/AppPage";
-import { App } from "../App";
-
-import { Suspense, lazy } from "react";
-
-const AdminPageLazy = lazy(() => import("../pages/AdminPage"));
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import { HomePage } from "../pages/HomePage";
+import { AppContent } from "../pages/AppContent";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <AppContent />,
     children: [
       {
-        index: true,
-        element: <AppPage />,
-      },
-      {
-        path: "/admin",
-        element: <AdminPageLazy />,
+        path: "account",
+        element: (
+          <ProtectedRoute>
+            <div>HELLO ACCOUNT</div>
+          </ProtectedRoute>
+        ),
       },
     ],
   },
+  {
+    index: true,
+    element: <HomePage />,
+  },
 ]);
 
-export function AppRoutes() {
-  const isAdmin = true;
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route index element={<AppPage />} />
-
-          <Route
-            path="admin"
-            element={
-              isAdmin ? (
-                <Suspense fallback={<div>Loading...</div>}>
-                  <AdminPageLazy />{" "}
-                </Suspense>
-              ) : (
-                <Navigate to={"/"} />
-              )
-            }
-          />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+export function Routes() {
+  return <RouterProvider router={router} />;
 }

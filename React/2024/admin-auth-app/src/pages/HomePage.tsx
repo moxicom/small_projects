@@ -1,19 +1,18 @@
-import { useState } from "react";
 import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
-export function AppPage() {
+export function HomePage() {
   return (
-    <div>
+    <div className="items-center">
       <div>
-        <Link to={"/admin"}>
+        <Link to={"/account"}>
           <img src={reactLogo} className="logo react" alt="React logo" />
         </Link>
       </div>
-      <h1>Home page</h1>
+      <h1>WELCOME</h1>
       <p className="read-the-docs">Click React icon to go to admin page</p>
+      <Outlet />
     </div>
   );
 }
