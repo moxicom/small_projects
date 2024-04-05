@@ -2,6 +2,8 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { HomePage } from "../pages/HomePage";
 import { AppContent } from "../pages/AppContent";
+import ListsPage from "../pages/ListsPage";
+import RegisterPage from "../pages/RegisterPage";
 
 const router = createBrowserRouter([
   {
@@ -9,10 +11,11 @@ const router = createBrowserRouter([
     element: <AppContent />,
     children: [
       {
-        path: "account",
+        path: "lists",
         element: (
           <ProtectedRoute>
-            <div>HELLO ACCOUNT</div>
+            {" "}
+            <ListsPage />
           </ProtectedRoute>
         ),
       },
@@ -21,6 +24,10 @@ const router = createBrowserRouter([
   {
     index: true,
     element: <HomePage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
 ]);
 

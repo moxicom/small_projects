@@ -6,7 +6,7 @@ export function HomePage() {
   return (
     <div className="items-center">
       <div>
-        <Link to={"/account"}>
+        <Link to={"/lists"}>
           <img src={reactLogo} className="logo react" alt="React logo" />
         </Link>
       </div>
