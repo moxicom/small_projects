@@ -4,6 +4,8 @@ import { HomePage } from "../pages/HomePage";
 import { AppContent } from "../pages/AppContent";
 import ListsPage from "../pages/ListsPage";
 import RegisterPage from "../pages/RegisterPage";
+import LoginPage from "../pages/LoginPage";
+import OnlyUnregisteredRoute from "./OnlyUnRegisteredRoute";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +16,6 @@ const router = createBrowserRouter([
         path: "lists",
         element: (
           <ProtectedRoute>
-            {" "}
             <ListsPage />
           </ProtectedRoute>
         ),
@@ -27,7 +28,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: (
+      <OnlyUnregisteredRoute>
+        <RegisterPage />
+      </OnlyUnregisteredRoute>
+    ),
+  },
+  {
+    path: "/login",
+    element: (
+      <OnlyUnregisteredRoute>
+        <LoginPage />
+      </OnlyUnregisteredRoute>
+    ),
   },
 ]);
 

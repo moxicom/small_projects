@@ -1,21 +1,25 @@
-import axios from "axios";
+import axios, { Axios, AxiosError } from "axios";
 import { urlProvider } from "../utils/urlProvider";
 
-export type FormData = {
+export type Data = {
   name: string;
   username: string;
   password: string;
 };
 
-export function registerRequest(data: FormData) {
+export async function registerRequest(data: Data) {
   const backUrl = urlProvider.getBackUrl();
-  console.log(backUrl);
-  axios
-    .post(backUrl + "/auth/sign-up", data)
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
+  const jsonData = JSON.stringify(data);
+  try {
+    const response = await axios.post(backUrl + "/auth/sign-up", jsonData, {
+      timeout: 5000,
     });
+    console.log(response);
+    return response;
+  } catch (e) {
+    const error = e as AxiosError;
+    if (error.response?.status === 409) {
+      throw error.response.status;
+    }
+  }
 }

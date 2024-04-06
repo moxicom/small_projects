@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
 import { useForm, FieldError } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { Data, registerRequest } from "../restRequests/register";
+import { loginRequest } from "../restRequests/login";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/userSlice";
 
-export default function RegisterPage() {
+type FormData = {
+  username: string;
+  password: string;
+};
+
+export default function LoginPage() {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const fieldStyle = "flex flex-col mb-2";
+
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,22 +22,23 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Data>({
+  } = useForm<FormData>({
     mode: "onBlur",
     reValidateMode: "onBlur",
   });
 
-  async function onSubmit(data: Data) {
+  async function onSubmit(data: FormData) {
     console.log("Submitted details:", data);
     setLoading(true);
     try {
-      const response = await registerRequest(data);
-      console.log(response);
+      const response = await loginRequest(data);
       setError(null);
+      dispatch(setUser({ token: response.token, username: data.username }));
+      navigate("/lists");
     } catch (error) {
       console.log(error);
-      if (error === 409) {
-        setError("User already exists");
+      if (error === 401) {
+        setError("Incorrect username or password");
       }
     } finally {
       setLoading(false);
@@ -37,7 +46,7 @@ export default function RegisterPage() {
   }
 
   function getEditorStyle(fieldError: FieldError | undefined) {
-    return fieldError ? "border-red-500" : "";
+    return fieldError ? "border-red-500 bg-black border-2" : "bg-black";
   }
   if (isLoading) {
     return <>Loading...</>;
@@ -45,19 +54,8 @@ export default function RegisterPage() {
     return (
       <>
         <div className="flex flex-col py-10 max-w-md mx-auto">
-          <h2 className="text-3xl font-bold mb-3">Register page</h2>
+          <h2 className="text-3xl font-bold mb-3">Login page</h2>
           <form noValidate onSubmit={handleSubmit(onSubmit)}>
-            <div className={fieldStyle}>
-              <label htmlFor="name">Your name</label>
-              <input
-                type="text"
-                id="name"
-                {...register("name", {
-                  required: "You must enter your name",
-                })}
-                className={getEditorStyle(errors.name)}
-              />
-            </div>
             <div className={fieldStyle}>
               <label htmlFor="username">Your username</label>
               <input
@@ -82,7 +80,8 @@ export default function RegisterPage() {
             </div>
             <div>
               <div>
-                Already registered? <Link to={"/login"}>Go to login page!</Link>
+                Don't have an account?
+                <Link to={"/register"}> Go register page!</Link>
               </div>
               {error && (
                 <div className="w-full text-red-600 bg-red-950 border-2 rounded-md p-1 mt-3 border-red-500">

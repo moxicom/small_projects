@@ -1,11 +1,15 @@
-import { Link } from "react-router-dom";
+type Props = {
+  listName: string;
+  listId: number;
+};
 
-export default function List() {
+export default function List({ listName, listId }: Props) {
   return (
-    <Link to={"login"}>
-      <div className="min-w-72 min-h-36 m-3 font-bold  bg-zinc-700 text-white">
-        asdasdadasd
-      </div>
-    </Link>
+    <button
+      className="w-full mb-3 min-h-16 bg-zinc-700 text-left text-pretty break-words"
+      onClick={() => console.log(listId + " opened")}
+    >
+      <p>{listName}</p>
+    </button>
   );
 }
