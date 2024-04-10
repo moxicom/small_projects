@@ -1,15 +1,43 @@
 import { useSelector } from "react-redux";
 import List from "../components/ListComponent";
 import { useEffect, useState } from "react";
-import { getLists, ListData } from "../restRequests/lists";
+import { createList, getLists, ListData } from "../restRequests/lists";
 import { AxiosError, AxiosResponse } from "axios";
 
 export default function ListsPage() {
   const { token } = useSelector((state: any) => state.user);
+
   const [isLoading, setLoading] = useState(true);
-  let lists: ListData[] = [];
+  const [lists, setLists] = useState<ListData[]>([]);
   const [error, setError] = useState<string | null>(null);
-  console.log("Lists page - " + token);
+
+  const deleteListClicked = (listId: number) => {
+    console.log("Delete clicked - " + listId);
+  };
+
+  const addListClicked = () => {
+    console.log("Clicked - Add new list");
+    setLoading(true);
+    setError(null);
+    createList(token)
+      .then((response: number) => {
+        console.log("created list id = " + response);
+        const newArray = [...lists];
+        newArray.push({
+          id: response,
+          title: "MyNewTitle",
+          description: "MyNewDescription",
+        });
+        setLists(newArray);
+      })
+      .catch((error: AxiosError) => {
+        console.log(error);
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -18,7 +46,7 @@ export default function ListsPage() {
       .then((response: ListData[]) => {
         console.log("response data = " + response);
         if (Array.isArray(response)) {
-          lists = response;
+          setLists(response);
         } else {
           console.error("Response is not an array");
         }
@@ -49,13 +77,18 @@ export default function ListsPage() {
           <div className="flex justify-center">
             <div className="mt-6 max-w-7xl">
               {lists.map((list) => (
-                <List listId={list.id} listName={list.title} />
+                <List
+                  key={list.id}
+                  listId={list.id}
+                  listName={list.title}
+                  onDelete={() => deleteListClicked(list.id)}
+                />
               ))}
             </div>
           </div>
           <button
             className="text-stone-800 bg-white hover:bg-transparent hover:text-white hover:border-white"
-            onClick={() => console.log("Clicked - Add new list")}
+            onClick={addListClicked}
           >
             Add new
           </button>

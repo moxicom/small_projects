@@ -1,5 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { urlProvider } from "../utils/urlProvider";
+// import { setJWTCookie } from "../utils/jwt";
+
 
 export type Data = {
   username: string;
@@ -14,7 +16,8 @@ export async function loginRequest(data: Data) {
       timeout: 5000,
     });
     console.log("response.data = ", response.data);
-    return response.data;
+    const token = response.data.token
+    return token;
   } catch (e) {
     const error = e as AxiosError;
     if (error.response?.status === 401) {

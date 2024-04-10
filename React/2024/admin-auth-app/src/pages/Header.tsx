@@ -1,13 +1,13 @@
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { removeUser } from "../store/userSlice";
+import useLogOut from "../hooks/useLogout";
 
 export default function Header() {
-  const dispatcher = useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const logOutClick = () => {
     console.log("Clicked - logOut");
-    dispatcher(removeUser());
+    useLogOut(dispatch)
     navigate("/login");
   };
   return (

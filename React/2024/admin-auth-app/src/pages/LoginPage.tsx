@@ -30,15 +30,19 @@ export default function LoginPage() {
   async function onSubmit(data: FormData) {
     console.log("Submitted details:", data);
     setLoading(true);
+    setError(null);
     try {
-      const response = await loginRequest(data);
-      setError(null);
-      dispatch(setUser({ token: response.token, username: data.username }));
+      const token = await loginRequest(data);
+      // dispatch can be used only in components :(
+      dispatch(setUser({token: token, username: data.username }));
+      // Navigate to main menu of user - lists, if there is no error
       navigate("/lists");
     } catch (error) {
       console.log(error);
       if (error === 401) {
         setError("Incorrect username or password");
+      } else {
+        setError("Something is wrong")
       }
     } finally {
       setLoading(false);
@@ -46,7 +50,7 @@ export default function LoginPage() {
   }
 
   function getEditorStyle(fieldError: FieldError | undefined) {
-    return fieldError ? "border-red-500 bg-black border-2" : "bg-black";
+    return fieldError ? "border-red-500 bg-black border-2 rounded-md" : "bg-black rounded-md";
   }
   if (isLoading) {
     return <>Loading...</>;
