@@ -6,6 +6,7 @@ import ListsPage from "../pages/ListsPage";
 import RegisterPage from "../pages/RegisterPage";
 import LoginPage from "../pages/LoginPage";
 import OnlyUnregisteredRoute from "./OnlyUnRegisteredRoute";
+import ListPage from "../pages/ListPage";
 
 const router = createBrowserRouter([
   {
@@ -20,12 +21,22 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "lists/:listId",
+        element: (
+          <ProtectedRoute>
+            <ListPage />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
+
   {
     index: true,
     element: <HomePage />,
   },
+
   {
     path: "/register",
     element: (

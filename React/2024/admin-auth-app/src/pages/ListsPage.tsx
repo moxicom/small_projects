@@ -3,17 +3,19 @@ import List from "../components/ListComponent";
 import { useEffect, useState } from "react";
 import { createList, getLists, ListData } from "../restRequests/lists";
 import { AxiosError, AxiosResponse } from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function ListsPage() {
   const { token } = useSelector((state: any) => state.user);
+  const navigate = useNavigate();
 
   const [isLoading, setLoading] = useState(true);
   const [lists, setLists] = useState<ListData[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const deleteListClicked = (listId: number) => {
-    console.log("Delete clicked - " + listId);
-  };
+  const openListClicked = (listId: number) => {
+    navigate(`${listId}`)
+  }
 
   const addListClicked = () => {
     console.log("Clicked - Add new list");
@@ -81,7 +83,7 @@ export default function ListsPage() {
                   key={list.id}
                   listId={list.id}
                   listName={list.title}
-                  onDelete={() => deleteListClicked(list.id)}
+                  onOpen={() => openListClicked(list.id) }
                 />
               ))}
             </div>
