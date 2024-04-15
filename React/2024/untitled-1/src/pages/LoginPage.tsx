@@ -12,7 +12,7 @@ export function LoginPage() {
   }
 
   return (
-    <div>
+    <div className="w-full mt-5">
       <Login></Login>
     </div>
   );
