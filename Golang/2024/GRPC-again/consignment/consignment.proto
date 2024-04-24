@@ -1,0 +1,27 @@
+//consigment.proto
+syntax = "proto3";
+
+package consignment;
+
+
+option go_package = "grpc-proj/consignment";
+
+service ShippingService {
+  rpc Get(GetRequest) returns (GetResponse);
+}
+
+message UserInfo {
+  int64 id = 1;
+  string name = 2;
+  bool is_pidor = 3;
+}
+
+// IF IT IS A REQUEST -> <Name>Request{}
+message GetRequest {
+  int64 id = 1;
+}
+
+// IF IT IS A RESPONSE -> <Name>Response{}
+message GetResponse {
+  UserInfo info = 1;
+}
