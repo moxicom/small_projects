@@ -1,0 +1,72 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int main()
+{
+    string rightString;
+    std::cin >> rightString;
+    // std::cout << std::endl
+    //           << "right string" << ' ' << rightString << std::endl;
+    string input;
+    std::cin >> input;
+
+    // std::cout << std::endl
+    //           << "input string" << ' ' << input << std::endl;
+
+    int inputLength = input.length();
+
+    string result;
+
+    int ansIdx = 0;
+    for (int i = 0; i < inputLength; i++)
+    {
+        if (input[i] == '<')
+        {
+            i++;
+            string command;
+            while (input[i] != '>')
+            {
+                command += input[i];
+                i++;
+            }
+            if (command == "left")
+            {
+                ansIdx--;
+            }
+            else if (command == "right")
+            {
+                ansIdx++;
+            }
+            else if (command == "bspace")
+            {
+                result.erase(ansIdx - 1, 1);
+                ansIdx--;
+            }
+            else if (command == "delete")
+            {
+                result.erase(ansIdx, 1);
+            }
+        }
+        else
+        {
+            result.insert(result.begin() + ansIdx, input[i]);
+            ansIdx++;
+        }
+    }
+
+    // std::cout << std::endl
+    //           << result << std::endl;
+    if (result == rightString)
+    {
+        std::cout << "Yes";
+    }
+    else
+    {
+        std::cout << "No";
+    }
+
+    return 0;
+}

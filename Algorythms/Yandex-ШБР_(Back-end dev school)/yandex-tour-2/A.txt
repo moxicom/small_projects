@@ -1,0 +1,168 @@
+// COMPLETED
+
+#include <iostream>
+#include <deque>
+#include <set>
+
+struct coord
+{
+    int x;
+    int y;
+};
+
+bool operator<(const coord &lhs, const coord &rhs)
+{
+    // Сначала сравниваем x
+    if (lhs.x < rhs.x)
+        return true;
+    if (lhs.x > rhs.x)
+        return false;
+    // Если x равны, сравниваем y
+    return lhs.y < rhs.y;
+}
+
+bool isWinner(const std::set<coord> &coords, coord newPoint)
+{
+    // Check horizontal --
+    int pointsLeft = 4;
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x - i, newPoint.y};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x + i, newPoint.y};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    if (pointsLeft == 0)
+        return true;
+
+    // Check vertical |
+    pointsLeft = 4;
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x, newPoint.y - i};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x, newPoint.y + i};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    if (pointsLeft == 0)
+        return true;
+
+    // Check anti-diagonal \ //
+    pointsLeft = 4;
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x - i, newPoint.y - i};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x + i, newPoint.y + i};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    if (pointsLeft == 0)
+        return true;
+
+    // Check diagonal /
+    pointsLeft = 4;
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x - i, newPoint.y + i};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    for (int i = 1; pointsLeft > 0; i++)
+    {
+        coord now = {newPoint.x + i, newPoint.y - i};
+        if (coords.find(now) != coords.end())
+            pointsLeft--;
+        else
+            break;
+    }
+
+    if (pointsLeft == 0)
+        return true;
+
+    return false;
+}
+
+int main()
+{
+    int n; // moves amount
+    std::cin >> n;
+
+    std::set<coord> O_coords;
+    std::set<coord> X_coords;
+    // bool f = false;
+
+    for (int i = 0; i < n; i++)
+    {
+        int x, y;
+        std::cin >> x >> y;
+        coord newPoint = {x, y};
+        if (i % 2 == 0)
+        {
+            X_coords.insert(newPoint);
+            if (isWinner(X_coords, newPoint) && i == n - 1)
+            {
+                std::cout << "First" << std::endl;
+                return 0;
+            }
+            else if (isWinner(X_coords, newPoint) && i != n - 1)
+            {
+                std::cout << "Inattention" << std::endl;
+                return 0;
+            }
+        }
+        else
+        {
+            O_coords.insert({x, y});
+            if (isWinner(O_coords, newPoint) && i == n - 1)
+            {
+                std::cout << "Second" << std::endl;
+                return 0;
+            }
+            else if (isWinner(O_coords, newPoint) && i != n - 1)
+            {
+                std::cout << "Inattention" << std::endl;
+                return 0;
+            }
+        }
+    }
+
+    std::cout << "Draw" << std::endl;
+
+    return 0;
+}

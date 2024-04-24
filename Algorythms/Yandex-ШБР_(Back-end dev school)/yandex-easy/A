@@ -1,0 +1,37 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <map>
+
+int main()
+{
+    std::string name;
+    std::cin >> name;
+    bool hasLowerCase = false;
+    bool hasUpperCase = false;
+    bool hasNumber = false;
+
+    if (name.length() < 8)
+    {
+        std::cout << "NO" << std::endl;
+        return 0;
+    }
+
+    for (auto now : name)
+    {
+        if (now <= '9' && now >= '0')
+            hasNumber = true;
+        else if (now <= 'z' && now >= 'a')
+            hasLowerCase = true;
+        else if (now <= 'Z' && now >= 'A')
+            hasUpperCase = true;
+    }
+
+    if (hasLowerCase && hasUpperCase && hasNumber)
+        std::cout << "YES" << std::endl;
+    else
+        std::cout << "NO" << std::endl;
+
+    return 0;
+}

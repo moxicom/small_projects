@@ -1,0 +1,43 @@
+// COMPLETED
+
+#include <iostream>
+#include <vector>
+#include <deque>
+
+int main()
+{
+    int n, k;
+    std::cin >> n >> k;
+
+    std::vector<int> amount(n, 0);
+    std::vector<int> cost(n, 0);
+    std::deque<int> window;
+
+    long sum = 0;
+
+    for (int i = 0; i < n; ++i)
+    {
+        std::cin >> cost[i];
+        if (!window.empty() && window.front() <= i - k)
+        {
+            window.pop_front(); // Remove elements outside the window
+        }
+        while (!window.empty() && cost[window.back()] >= cost[i])
+        {
+            window.pop_back(); // Remove elements with higher cost
+        }
+        window.push_back(i);
+
+        sum += cost[window.front()]; // Add minimum cost within the window
+        amount[window.front()]++;    // Increment the count of selected element
+    }
+
+    std::cout << sum << std::endl;
+
+    for (int i = 0; i < n; ++i)
+    {
+        std::cout << amount[i] << " ";
+    }
+
+    return 0;
+}
