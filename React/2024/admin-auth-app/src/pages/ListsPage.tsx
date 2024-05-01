@@ -14,16 +14,14 @@ export default function ListsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const openListClicked = (listId: number) => {
-    navigate(`${listId}`)
-  }
+    navigate(`${listId}`);
+  };
 
   const addListClicked = () => {
-    console.log("Clicked - Add new list");
     setLoading(true);
     setError(null);
     createList(token)
       .then((response: number) => {
-        console.log("created list id = " + response);
         const newArray = [...lists];
         newArray.push({
           id: response,
@@ -33,7 +31,6 @@ export default function ListsPage() {
         setLists(newArray);
       })
       .catch((error: AxiosError) => {
-        console.log(error);
         setError(error.message);
       })
       .finally(() => {
@@ -54,7 +51,6 @@ export default function ListsPage() {
         }
       })
       .catch((error: AxiosError) => {
-        console.log(error);
         setError(error.message);
       })
       .finally(() => {
@@ -76,14 +72,14 @@ export default function ListsPage() {
       )}
       {!error && (
         <>
-          <div className="flex justify-center">
-            <div className="mt-6 max-w-7xl">
+          <div className="flex justify-center w-full">
+            <div className="mt-6 max-w-7xl w-full">
               {lists.map((list) => (
                 <List
                   key={list.id}
-                  listId={list.id}
-                  listName={list.title}
-                  onOpen={() => openListClicked(list.id) }
+                  objectId={list.id}
+                  objectName={list.title}
+                  onOpen={() => openListClicked(list.id)}
                 />
               ))}
             </div>

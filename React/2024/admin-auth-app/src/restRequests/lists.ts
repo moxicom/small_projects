@@ -21,9 +21,6 @@ export async function getLists(token: string) {
   } catch (e) {
     console.log(e);
     const error = e as AxiosError;
-    if (error.response?.status === 401) {
-      throw error.response.status;
-    }
     throw error;
   }
 }
@@ -48,9 +45,23 @@ export async function createList(token: string) {
   } catch (e) {
     console.log(e);
     const error = e as AxiosError;
-    if (error.response?.status === 401) {
-      throw error.response.status;
-    }
+    throw error;
+  }
+}
+
+export async function deleteList(token: string, listId: number) {
+  const backUrl = urlProvider.getBackUrl();
+  try {
+    const response = await axios.delete(`${backUrl}/api/lists/${listId}`, {
+      timeout: 5000,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (e) {
+    console.log("cought error = " + e);
+    const error = e as AxiosError;
     throw error;
   }
 }
