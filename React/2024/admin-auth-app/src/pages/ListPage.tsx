@@ -158,7 +158,7 @@ export default function ListPage() {
           </div>
 
           <div className="flex justify-center w-full">
-            <div className="mt-6 max-w-7xl w-full">
+            <div className="w-full max-w-7xl mt-6">
               {items.map((item) => (
                 <Item
                   key={item.id}

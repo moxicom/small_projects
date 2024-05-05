@@ -19,17 +19,19 @@ export default function Item(props: Props) {
   }
   return (
     <>
-      <div className="flex align-middle mb-3">
+
+      <div className="flex align-middle mb-3 max-w-7xl">
         <button
           className={`
-            max-w-6xl
             text-wrap
-            h-full
             flex-1
             border-t-4
             border-0
-            rounded-r-none min-h-16 text-left
-            break-words bg-zinc-700
+            rounded-r-none
+            min-h-16
+            text-left
+            break-all
+            bg-zinc-700
             ${border}
             hover:border-t-slate-50
            `}
@@ -38,7 +40,7 @@ export default function Item(props: Props) {
           {props.objectName}
         </button>
         <button
-          className="rounded-l-none"
+          className="rounded-l-none mr-0"
           onClick={() => props.onDelete(props.objectId)}
         >
           del

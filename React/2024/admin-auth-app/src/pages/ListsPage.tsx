@@ -9,6 +9,7 @@ export default function ListsPage() {
   const { token } = useSelector((state: any) => state.user);
   const navigate = useNavigate();
 
+  const [newTitle, setNewTitle] = useState("")
   const [isLoading, setLoading] = useState(true);
   const [lists, setLists] = useState<ListData[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -18,17 +19,19 @@ export default function ListsPage() {
   };
 
   const addListClicked = () => {
+    if (newTitle.trim() == "") {
+      return
+    }
     setLoading(true);
     setError(null);
-    createList(token)
-      .then((response: number) => {
-        const newArray = [...lists];
-        newArray.push({
-          id: response,
-          title: "MyNewTitle",
-          description: "MyNewDescription",
-        });
-        setLists(newArray);
+    createList(token, newTitle)
+      .then((createdID: number) => {
+        lists.push({
+          id: createdID,
+          description: "",
+          title: newTitle,
+        })
+        setLists(lists);
       })
       .catch((error: AxiosError) => {
         setError(error.message);
@@ -72,6 +75,23 @@ export default function ListsPage() {
       )}
       {!error && (
         <>
+          <div className="w-full h-auto flex justify-center">
+            <div className="flex w-full max-w-7xl rounded-lg overflow-hidden">
+              <input
+                className="w-full flex-1 rounded-l-lg p-3 bg-zinc-700"
+                placeholder="List title"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+              ></input>
+              <button
+                className="rounded-l-none"
+                onClick={() => addListClicked()}
+              >
+                New
+              </button>
+            </div>
+          </div>
+
           <div className="flex justify-center w-full">
             <div className="mt-6 max-w-7xl w-full">
               {lists.map((list) => (
@@ -84,12 +104,6 @@ export default function ListsPage() {
               ))}
             </div>
           </div>
-          <button
-            className="text-stone-800 bg-white hover:bg-transparent hover:text-white hover:border-white"
-            onClick={addListClicked}
-          >
-            Add new
-          </button>
         </>
       )}
     </>

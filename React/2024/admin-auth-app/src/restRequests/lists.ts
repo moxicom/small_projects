@@ -26,12 +26,12 @@ export async function getLists(token: string) {
 }
 
 // Returns id of the created list
-export async function createList(token: string) {
+export async function createList(token: string, title: string) {
   const backUrl = urlProvider.getBackUrl();
   const data = JSON.stringify({
-    description: "MyNewDescription",
+    description: "empty",
     id: 0,
-    title: "MyNewTitle",
+    title: title,
   });
 
   try {
