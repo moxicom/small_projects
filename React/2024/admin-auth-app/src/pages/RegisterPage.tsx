@@ -25,6 +25,7 @@ export default function RegisterPage() {
     try {
       const response = await registerRequest(data);
       console.log(response);
+      navigate("/login")
       setError(null);
     } catch (error) {
       console.log(error);
@@ -37,7 +38,7 @@ export default function RegisterPage() {
   }
 
   function getEditorStyle(fieldError: FieldError | undefined) {
-    return fieldError ? "border-red-500" : "";
+    return fieldError ? "border-red-500 bg-black border-2 rounded-md" : "bg-black rounded-md";
   }
   if (isLoading) {
     return <>Loading...</>;
