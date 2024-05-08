@@ -1,98 +1,71 @@
 #include <iostream>
-#include <vector>
-#include <map>
 #include <queue>
 
 using namespace std;
 
-struct Path
+class Node
 {
-    int to;
-    int time;
-    long long cost = 0; // 0 == old way
-    int num = -1;
+public:
+    int val;
+    Node *left;
+    Node *right;
+    Node *next;
+
+    Node() : val(0), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val) : val(_val), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val, Node *_left, Node *_right, Node *_next)
+        : val(_val), left(_left), right(_right), next(_next) {}
 };
 
-bool hasPath(map<int, vector<Path>> &ways, int start, int end, int maxTime, long long maxCost)
+struct status
 {
-    queue<int> q;
-    vector<bool> visited(ways.size() + 1, false); // Assuming vertices are numbered from 1 to n
-    q.push(start);
-    visited[start] = true;
+    Node *node;
+    int depth;
+};
 
-    while (!q.empty())
+class Solution
+{
+public:
+    Node *connect(Node *root)
     {
-        int current = q.front();
-        q.pop();
+        if (root == NULL)
+            return NULL;
 
-        for (const auto &path : ways[current])
+        queue<status> q;
+
+        q.push({root, 0});
+
+        for (; !q.empty();)
         {
-            if (!visited[path.to] && path.time <= maxTime)
+            status top = q.front();
+            q.pop();
+            if (top.node->left != NULL)
             {
-                if (path.to == end)
-                    return true;
-                q.push(path.to);
-                visited[path.to] = true;
+                q.push({top.node->left, top.depth + 1});
             }
+            if (top.node->right != NULL)
+            {
+                q.push({top.node->right, top.depth + 1});
+            }
+
+            if (q.empty())
+            {
+                continue;
+            }
+            if (q.front().depth != top.depth)
+            {
+                continue;
+            }
+            top.node->next = q.front().node;
         }
+
+        return root;
     }
-    return false;
-}
+};
 
 int main()
 {
-    int n, m;
-    cin >> n >> m;
-
-    map<int, vector<Path>> ways;
-
-    map<int, map<int, int>> time; // need to complete
-
-    vector<int> cost(n, -1);
-
-    for (int i = 1; i < m + 1; i++)
-    {
-        int u, v, t;
-        cin >> u >> v >> t;
-        ways[u] = {{v, t, 0, -1}};
-        ways[v] = {{u, t, 0, -1}};
-    }
-
-    int k;
-    cin >> k;
-    for (int i = 1; i < k + 1; i++)
-    {
-        int u, v, t, c;
-        cin >> u >> v >> t >> c;
-        ways[u].push_back({v, t, c, i});
-        ways[v].push_back({u, t, c, i});
-    }
-
-    int p;
-    cin >> p;
-    vector<int> ans;
-    for (int i = 0; i < p; i++)
-    {
-        int a, b, t;
-        cin >> a >> b >> t;
-        time[a][b] = t;
-        time[b][a] = t;
-        if (!hasPath(ways, a, b, t))
-        {
-            // Check if we can use k's
-            cout << "No way in " << a << ' ' << b << endl;
-        }
-    }
-    if (ans.size() == 0)
-    {
-        cout << 0;
-    }
-    else
-    {
-        cout << ans.size();
-        for (int i = 0; i < ans.size(); i++)
-        {
-            cout << ans[i] << " ";
-        }
-    }
+    return 0;
 }
