@@ -7,5 +7,3 @@ type Category struct {
 	Name string             `bson:"name,omitempty"`
 }
 
-type Products struct {
-}
