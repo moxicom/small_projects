@@ -3,6 +3,7 @@ package mongo_storage
 import (
 	"context"
 	"mongo_lrn/internal/config"
+	"mongo_lrn/internal/models"
 	"mongo_lrn/internal/storage/mongo_storage/category_rep"
 	"mongo_lrn/internal/storage/mongo_storage/product_rep"
 	"time"
@@ -15,8 +16,7 @@ import (
 const DBName = "db_test"
 
 type Category interface {
-	// category interface
-	// TODO: implement
+	NewCategory(context.Context, models.Category) (insertedID interface{}, err error)
 }
 
 type Product interface {

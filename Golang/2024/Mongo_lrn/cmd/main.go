@@ -5,6 +5,7 @@ import (
 	"log"
 	"mongo_lrn/internal/config"
 	"mongo_lrn/internal/storage/mongo_storage"
+	"mongo_lrn/internal/usecase"
 )
 
 func main() {
@@ -28,6 +29,13 @@ func main() {
 		}
 	}()
 
-	// r := mongo_storage.NewRepository(client)
-	// uc := usecase.New(r)
+	r := mongo_storage.NewRepository(client)
+	uc := usecase.New(r)
+
+	id, err := uc.NewCategory("zxcqwe")
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(id)
 }
