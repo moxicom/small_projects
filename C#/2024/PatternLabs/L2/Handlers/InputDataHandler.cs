@@ -7,6 +7,8 @@ class InputDataHandler : AbstractHandler
         if (!DataInteract.FormatIsValid(data))
         {
             Console.WriteLine("Invalid format");
+            // or throw an exception
+            return null;
         }
 
         Console.WriteLine($"Input data is valid");
