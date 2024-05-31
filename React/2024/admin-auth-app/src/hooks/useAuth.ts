@@ -11,6 +11,7 @@ export function useAuth(dispatch: Dispatch) {
   }
   return {
     isAuth: !!username,
+    // isAuth: true,
     token,
   };
 }
