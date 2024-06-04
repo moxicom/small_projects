@@ -22,8 +22,14 @@ type Client struct {
 	Send chan Message
 }
 
+type Message struct {
+	ToID uint64 `json:"to_id,omitempty"`
+	Msg  string `json:"msg,omitempty"`
+}
+
 func (c *Client) readWS() {
 	defer func() {
+		log.Println("ReadWS closed")
 		c.Hub.Unregister <- c
 		c.Con.Close()
 	}()
@@ -56,6 +62,13 @@ func (c *Client) readWS() {
 			break
 		}
 
+		if msg.Msg == "" || msg.ToID == 0 {
+			log.Printf("error %v\n", "validation")
+			break
+		}
+
+		log.Println(msg)
+
 		c.Hub.Broadcast <- msg
 	}
 }
@@ -64,6 +77,7 @@ func (c *Client) writeWS() {
 	ticker := time.NewTicker(pingPeriod)
 
 	defer func() {
+		log.Println("WriteWS closed")
 		c.Hub.Unregister <- c
 		c.Con.Close()
 	}()
@@ -84,7 +98,7 @@ func (c *Client) writeWS() {
 				return
 			}
 
-			w.Write([]byte(msg.msg))
+			w.Write([]byte(msg.Msg))
 
 			if err := w.Close(); err != nil {
 				log.Println(err.Error())

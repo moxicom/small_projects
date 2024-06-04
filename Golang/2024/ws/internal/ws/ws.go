@@ -24,7 +24,7 @@ func Upgrade(hub *Hub, w http.ResponseWriter, r *http.Request) {
 
 	userIDstr := r.URL.Query().Get("id")
 	if userIDstr == "" {
-		http.Error(w, fmt.Errorf("No id in query").Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Errorf("no id in query").Error(), http.StatusBadRequest)
 		fmt.Printf("error: %s\n", "No id in query")
 		return
 	}
@@ -41,8 +41,8 @@ func Upgrade(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	con, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
-	defer con.Close()
 
 	client := &Client{ID: userID, Hub: hub, Con: con, Send: make(chan Message, 256)}
 	client.Hub.Register <- client

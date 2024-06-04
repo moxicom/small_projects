@@ -1,6 +1,9 @@
 package ws
 
-import "sync"
+import (
+	"log"
+	"sync"
+)
 
 type Hub struct {
 	Clients    sync.Map
@@ -9,23 +12,27 @@ type Hub struct {
 	Broadcast  chan Message
 }
 
-type Message struct {
-	ToID uint64
-	msg  string
-}
-
 func NewHub() *Hub {
-	return &Hub{}
+	return &Hub{
+		Clients:    sync.Map{},
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Broadcast:  make(chan Message),
+	}
 }
 
 func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.Register:
+			log.Printf("New Client<%v> has been registered", client.ID)
 			h.Clients.Store(client.ID, client)
 		case client := <-h.Unregister:
-			h.Clients.Delete(client.ID)
-			close(client.Send)
+			if _, ok := h.Clients.Load(client.ID); ok {
+				log.Printf("Connection with Client<%v> has been closed", client.ID)
+				h.Clients.Delete(client.ID)
+				close(client.Send)
+			}
 		case msg := <-h.Broadcast:
 			v, ok := h.Clients.Load(msg.ToID)
 			if !ok {
@@ -39,6 +46,7 @@ func (h *Hub) Run() {
 			default:
 				close(targetClient.Send)
 				h.Clients.Delete(targetClient.ID)
+				log.Printf("Connection with Client<%v> has been closed", targetClient.ID)
 			}
 		}
 	}
