@@ -39,7 +39,7 @@ func (h *Hub) Run() {
 				continue
 			}
 
-			targetClient := v.(Client)
+			targetClient := v.(*Client)
 
 			select {
 			case targetClient.Send <- msg:

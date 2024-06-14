@@ -36,6 +36,11 @@ func Upgrade(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//
+	// You can use JWT here or something and parse ID from it
+	// Current ws server does not use auth
+	//
+
 	fmt.Printf("User ID on upgrade %v\n", userID)
 
 	con, err := upgrader.Upgrade(w, r, nil)

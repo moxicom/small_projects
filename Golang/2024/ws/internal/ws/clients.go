@@ -23,8 +23,9 @@ type Client struct {
 }
 
 type Message struct {
-	ToID uint64 `json:"to_id,omitempty"`
-	Msg  string `json:"msg,omitempty"`
+	FromID uint64 `json:"from_id"`
+	ToID   uint64 `json:"to_id,omitempty"`
+	Msg    string `json:"msg,omitempty"`
 }
 
 func (c *Client) readWS() {
@@ -62,7 +63,7 @@ func (c *Client) readWS() {
 			break
 		}
 
-		if msg.Msg == "" || msg.ToID == 0 {
+		if msg.Msg == "" || msg.ToID == 0 || msg.FromID == 0 {
 			log.Printf("error %v\n", "validation")
 			break
 		}
@@ -98,7 +99,13 @@ func (c *Client) writeWS() {
 				return
 			}
 
-			w.Write([]byte(msg.Msg))
+			msgJson, err := json.Marshal(msg)
+			if err != nil {
+				log.Println(err.Error())
+				return
+			}
+
+			w.Write(msgJson)
 
 			if err := w.Close(); err != nil {
 				log.Println(err.Error())
