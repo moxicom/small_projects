@@ -1,13 +1,28 @@
 package service
 
-import "elastic/internal/pkg/storage"
+import (
+	"context"
+	"elastic/internal/pkg/models"
+	"elastic/internal/pkg/storage"
+)
 
 type Service struct {
-	storage storage.ProductStorer
+	Storage storage.ProductStorer
+	Pg      interface{}
 }
 
 func New(storage storage.ProductStorer) *Service {
-	return &Service{storage}
+	return &Service{Storage: storage}
 }
 
-func (s *Service)
+func (s *Service) InsertProduct(ctx context.Context, prod models.Product) error {
+	return s.Storage.InsertProduct(ctx, prod)
+}
+
+func (s *Service) UpdateProduct(ctx context.Context, prod models.Product) error {
+	return s.Storage.UpdateProduct(ctx, prod)
+}
+
+func (s *Service) DeleteProduct(ctx context.Context, prodID int) error {
+	return s.Storage.DeleteProduct(ctx, prodID)
+}

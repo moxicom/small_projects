@@ -1,13 +1,13 @@
 package models
 
 type Product struct {
-	ID         int
-	Name       string
-	Price      float32
-	Properties []Proprty
+	ID         int       `json:"id"`
+	Name       string    `json:"name"`
+	Price      float32   `json:"price"`
+	Properties []Proprty `json:"properties"`
 }
 
 type Proprty struct {
-	Title string
-	Desc  string
+	Title string `json:"title"`
+	Desc  string `json:"desc"`
 }

@@ -3,11 +3,18 @@ package storage
 import (
 	"context"
 	"elastic/internal/pkg/models"
+	"elastic/internal/pkg/storage/elastic"
 )
 
 type ProductStorer interface {
-	Insert(ctx context.Context, prod models.Product) error
-	Update(ctx context.Context, prod models.Product) error
-	Delete(ctx context.Context, prod models.Product) error
-	FindMany(ctx context.Context, prod models.Product) ([]models.Product, error)
+	InitIndexes(indexes elastic.Indexes) error
+	InsertProduct(ctx context.Context, prod models.Product) error
+	UpdateProduct(ctx context.Context, prod models.Product) error
+	DeleteProduct(ctx context.Context, prodID int) error
+	FindManyProducts(ctx context.Context, prod models.Product) ([]models.Product, error)
+
+	//InsertCategory(ctx context.Context, prod models.Product) error
+	//UpdateCategory(ctx context.Context, prod models.Product) error
+	//DeleteCategory(ctx context.Context, prod models.Product) error
+	//FindManyCategories(ctx context.Context, prod models.Product) ([]models.Product, error)
 }
