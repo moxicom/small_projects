@@ -26,3 +26,7 @@ func (s *Service) UpdateProduct(ctx context.Context, prod models.Product) error 
 func (s *Service) DeleteProduct(ctx context.Context, prodID int) error {
 	return s.Storage.DeleteProduct(ctx, prodID)
 }
+
+func (s *Service) SearchProduct(ctx context.Context, searchStr string) ([]models.Product, error) {
+	return s.Storage.FindManyProducts(ctx, searchStr)
+}

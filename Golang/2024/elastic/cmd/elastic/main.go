@@ -6,6 +6,9 @@ import (
 	"elastic/internal/service"
 )
 
+// docker run --name kib01 --net somenetwork -p 5601:5601 kibana:8.14.1
+// docker run -d --name elasticsearch --net somenetwork -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:8.14.1
+
 func main() {
 	// Todo init all storages Mxc*o5237LyzBqadjGkY
 
@@ -22,6 +25,7 @@ func main() {
 
 	// Todo Init service layer
 	service := service.New(e)
+
 	//err = service.InsertProduct(context.TODO(), models.Product{
 	//	ID:    1,
 	//	Name:  "Product name",
@@ -33,7 +37,10 @@ func main() {
 	//		},
 	//	},
 	//})
-	//err = service.UpdateProduct(context.TODO(), models.Product{
+
+	_, err = service.SearchProduct(context.TODO(), "qe")
+
+	//service.UpdateProduct(context.TODO(), models.Product{
 	//	ID:    1,
 	//	Price: 122,
 	//	Properties: []models.Proprty{
@@ -44,12 +51,14 @@ func main() {
 	//	},
 	//	Name: "Fixed name",
 	//})
-	err = service.DeleteProduct(context.TODO(), 1)
+
+	// service.DeleteProduct(context.TODO(), 1)
+
 	if err != nil {
 		panic(err)
 	}
+
 	// Todo Init API layer
 
 	// Todo run app
-
 }

@@ -3,7 +3,7 @@ package elastic
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v7"
 	"net/http"
 )
 
@@ -21,11 +21,7 @@ type Elastic struct {
 
 func New(addresses []string, indexes Indexes) (*Elastic, error) {
 	cfg := elasticsearch.Config{
-		Addresses: []string{
-			"https://localhost:9200",
-		},
-		Username: "elastic",
-		Password: "Mxc*o5237LyzBqadjGkY",
+		Addresses: []string{"http://localhost:9200"},
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
@@ -35,17 +31,17 @@ func New(addresses []string, indexes Indexes) (*Elastic, error) {
 
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating Elasticsearch client: %w", err)
 	}
 
 	res, err := client.Info()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting Elasticsearch info: %w", err)
 	}
 	defer res.Body.Close()
 
 	if res.IsError() {
-		return nil, fmt.Errorf("error: %s", res.String())
+		return nil, fmt.Errorf("error response from Elasticsearch: %s", res.String())
 	}
 
 	e := &Elastic{
@@ -55,7 +51,7 @@ func New(addresses []string, indexes Indexes) (*Elastic, error) {
 
 	err = e.InitIndexes(indexes)
 	if err != nil {
-		return nil, fmt.Errorf("error initializing indexes: %s", err)
+		return nil, fmt.Errorf("error initializing indexes: %w", err)
 	}
 
 	return e, nil

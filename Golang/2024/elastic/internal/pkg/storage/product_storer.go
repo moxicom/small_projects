@@ -11,7 +11,7 @@ type ProductStorer interface {
 	InsertProduct(ctx context.Context, prod models.Product) error
 	UpdateProduct(ctx context.Context, prod models.Product) error
 	DeleteProduct(ctx context.Context, prodID int) error
-	FindManyProducts(ctx context.Context, prod models.Product) ([]models.Product, error)
+	FindManyProducts(ctx context.Context, searchStr string) ([]models.Product, error)
 
 	//InsertCategory(ctx context.Context, prod models.Product) error
 	//UpdateCategory(ctx context.Context, prod models.Product) error

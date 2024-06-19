@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"log"
 	"strconv"
+	"strings"
 )
 
 func (e *Elastic) InsertProduct(ctx context.Context, prod models.Product) error {
@@ -101,6 +103,56 @@ func (e *Elastic) DeleteProduct(ctx context.Context, prodID int) error {
 	return nil
 }
 
-func (e *Elastic) FindManyProducts(ctx context.Context, prod models.Product) ([]models.Product, error) {
+func (e *Elastic) FindManyProducts(ctx context.Context, searchStr string) ([]models.Product, error) {
+	query := fmt.Sprintf(`{"query": {"match": {"name": "%s"}}}`, searchStr)
+
+	//data, err := json.Marshal(query)
+	//if err != nil {
+	//	return []models.Product{}, fmt.Errorf("%s : %w", ErrMarshal, err)
+	//}
+
+	req := esapi.SearchRequest{
+		Index: []string{e.Indexes.Product + "*"},
+		Body:  strings.NewReader(query),
+	}
+
+	res, err := req.Do(ctx, e.client)
+
+	if err != nil {
+		return []models.Product{}, fmt.Errorf("cannot search document: %w", err)
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		return []models.Product{}, fmt.Errorf("error in searching document response: %s", res.String())
+	}
+
+	fmt.Println(res)
+
+	var r map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		log.Fatalf("Error parsing the response body: %s", err)
+	}
+
+	var products []models.Product
+	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
+		// Преобразуем источник документа в JSON
+		source, err := json.Marshal(hit.(map[string]interface{})["_source"])
+		if err != nil {
+			log.Fatalf("Error marshalling hit source: %s", err)
+		}
+
+		// Декодируем JSON в структуру Article
+		var product models.Product
+		if err := json.Unmarshal(source, &product); err != nil {
+			log.Fatalf("Error unmarshalling hit source: %s", err)
+		}
+
+		// Добавляем документ в список статей
+		products = append(products, product)
+	}
+
+	fmt.Printf("Found %d products\n", len(products))
+	fmt.Println(products)
 	return []models.Product{}, nil
 }
