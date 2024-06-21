@@ -13,9 +13,10 @@ func main() {
 	// Todo init all storages Mxc*o5237LyzBqadjGkY
 
 	e, err := elastic.New(
-		[]string{"asdasd"},
+		context.Background(),
+		"http://localhost:9200",
 		elastic.Indexes{
-			Product:  "document",
+			Product:  "product",
 			Category: "category",
 		},
 	)
@@ -26,19 +27,19 @@ func main() {
 	// Todo Init service layer
 	service := service.New(e)
 
-	//err = service.InsertProduct(context.TODO(), models.Product{
-	//	ID:    1,
-	//	Name:  "Product name",
-	//	Price: 12,
-	//	Properties: []models.Proprty{
-	//		models.Proprty{
-	//			Title: "Desc",
-	//			Desc:  "Good zxczxczx",
-	//		},
-	//	},
-	//})
+	// err = service.InsertProduct(context.TODO(), models.Product{
+	// 	ID:    1,
+	// 	Name:  "Product name",
+	// 	Price: 12,
+	// 	Properties: []models.Property{
+	// 		{
+	// 			Title: "Desc",
+	// 			Desc:  "Good zxczxczx",
+	// 		},
+	// 	},
+	// })
 
-	_, err = service.SearchProduct(context.TODO(), "qe")
+	// _, err = service.SearchProduct(context.TODO(), "qe")
 
 	//service.UpdateProduct(context.TODO(), models.Product{
 	//	ID:    1,
@@ -53,6 +54,8 @@ func main() {
 	//})
 
 	// service.DeleteProduct(context.TODO(), 1)
+
+	_, err = service.SearchProduct(context.Background(), "qwe")
 
 	if err != nil {
 		panic(err)

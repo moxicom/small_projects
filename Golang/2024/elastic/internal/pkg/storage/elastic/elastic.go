@@ -1,10 +1,12 @@
 package elastic
 
 import (
-	"crypto/tls"
+	"context"
+	"elastic/internal/pkg/models"
 	"fmt"
-	"github.com/elastic/go-elasticsearch/v7"
-	"net/http"
+	"log"
+
+	"github.com/olivere/elastic/v7"
 )
 
 const aliasPostfix = "_alias"
@@ -15,33 +17,26 @@ type Indexes struct {
 }
 
 type Elastic struct {
-	client  *elasticsearch.Client
+	client  *elastic.Client
 	Indexes Indexes
 }
 
-func New(addresses []string, indexes Indexes) (*Elastic, error) {
-	cfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		},
-	}
-
-	client, err := elasticsearch.NewClient(cfg)
+func New(ctx context.Context, URL string, indexes Indexes) (*Elastic, error) {
+	client, err := elastic.NewClient(
+		elastic.SetBasicAuth(
+			"elastic",
+			"changeme",
+		),
+		elastic.SetURL(URL),
+		elastic.SetSniff(false),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Elasticsearch client: %w", err)
 	}
 
-	res, err := client.Info()
+	_, _, err = client.Ping(URL).Do(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting Elasticsearch info: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.IsError() {
-		return nil, fmt.Errorf("error response from Elasticsearch: %s", res.String())
 	}
 
 	e := &Elastic{
@@ -49,60 +44,44 @@ func New(addresses []string, indexes Indexes) (*Elastic, error) {
 		Indexes: indexes,
 	}
 
-	err = e.InitIndexes(indexes)
-	if err != nil {
-		return nil, fmt.Errorf("error initializing indexes: %w", err)
-	}
+	// err = e.initIndexes(ctx, indexes)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error initializing indexes: %w", err)
+	// }
 
 	return e, nil
 }
 
-func (e *Elastic) createIndex(index string) error {
-	alias := index + aliasPostfix
-
-	res, err := e.client.Indices.Exists([]string{index})
+func (e *Elastic) createIndexIfNotExists(ctx context.Context, index string, mapping string) error {
+	log.Printf("Checking if index %s exists...\n", index)
+	exists, err := e.client.IndexExists(index).Do(ctx)
 	if err != nil {
-		return fmt.Errorf("cannot check index existence: %w", err)
+		return fmt.Errorf("error checking if index %s exists: %s", index, err.Error())
 	}
-	if res.StatusCode == 200 {
+
+	if exists {
+		log.Printf("Index %s already exists\n", index)
 		return nil
 	}
-	if res.StatusCode != 404 {
-		return fmt.Errorf("error in index existence response: %s", res.String())
-	}
 
-	res, err = e.client.Indices.Create(index)
+	log.Printf("Index %s does not exist. Creating index...\n", index)
+	_, err = e.client.CreateIndex(index).Do(ctx)
 	if err != nil {
-		return fmt.Errorf("cannot create index: %w", err)
-	}
-	if res.IsError() {
-		return fmt.Errorf("error in index creation response: %s", res.String())
+		return fmt.Errorf("error creating index %s: %s", index, err.Error())
 	}
 
-	res, err = e.client.Indices.PutAlias([]string{index}, alias)
-	if err != nil {
-		return fmt.Errorf("cannot create index alias: %w", err)
-	}
-	if res.IsError() {
-		return fmt.Errorf("error in index alias creation response: %s", res.String())
-	}
-
+	log.Printf("Index %s created successfully\n", index)
 	return nil
 }
 
-// document represents a single document in Get API response body.
-type document struct {
-	Source interface{} `json:"_source"`
-}
-
 // InitIndexes Manually init every index
-func (e *Elastic) InitIndexes(indexes Indexes) error {
-	err := e.createIndex(indexes.Product)
+func (e *Elastic) initIndexes(ctx context.Context, indexes Indexes) error {
+	err := e.createIndexIfNotExists(ctx, indexes.Product, models.ProductMapping)
 	if err != nil {
 		return err
 	}
 
-	err = e.createIndex(indexes.Category)
+	err = e.createIndexIfNotExists(ctx, indexes.Category, models.CategoryMapping)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,9 @@ import (
 	"context"
 	"elastic/internal/pkg/models"
 	"elastic/internal/pkg/storage"
+	"encoding/json"
+	"fmt"
+	"strconv"
 )
 
 type Service struct {
@@ -16,16 +19,22 @@ func New(storage storage.ProductStorer) *Service {
 }
 
 func (s *Service) InsertProduct(ctx context.Context, prod models.Product) error {
-	return s.Storage.InsertProduct(ctx, prod)
+	id := strconv.Itoa(prod.ID)
+	jsonBody, err := json.Marshal(prod)
+	if err != nil {
+		return fmt.Errorf("error on marshalling json body")
+	}
+
+	return s.Storage.InsertProduct(ctx, id, jsonBody)
 }
 
-func (s *Service) UpdateProduct(ctx context.Context, prod models.Product) error {
-	return s.Storage.UpdateProduct(ctx, prod)
-}
+// func (s *Service) UpdateProduct(ctx context.Context, prod models.Product) error {
+// 	return s.Storage.UpdateProduct(ctx, prod)
+// }
 
-func (s *Service) DeleteProduct(ctx context.Context, prodID int) error {
-	return s.Storage.DeleteProduct(ctx, prodID)
-}
+// func (s *Service) DeleteProduct(ctx context.Context, prodID int) error {
+// 	return s.Storage.DeleteProduct(ctx, prodID)
+// }
 
 func (s *Service) SearchProduct(ctx context.Context, searchStr string) ([]models.Product, error) {
 	return s.Storage.FindManyProducts(ctx, searchStr)
