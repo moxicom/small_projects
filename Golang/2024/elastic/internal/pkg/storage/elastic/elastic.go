@@ -44,10 +44,10 @@ func New(ctx context.Context, URL string, indexes Indexes) (*Elastic, error) {
 		Indexes: indexes,
 	}
 
-	// err = e.initIndexes(ctx, indexes)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error initializing indexes: %w", err)
-	// }
+	err = e.initIndexes(ctx, indexes)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing indexes: %w", err)
+	}
 
 	return e, nil
 }
@@ -65,7 +65,7 @@ func (e *Elastic) createIndexIfNotExists(ctx context.Context, index string, mapp
 	}
 
 	log.Printf("Index %s does not exist. Creating index...\n", index)
-	_, err = e.client.CreateIndex(index).Do(ctx)
+	_, err = e.client.CreateIndex(index).BodyString(mapping).Do(ctx)
 	if err != nil {
 		return fmt.Errorf("error creating index %s: %s", index, err.Error())
 	}

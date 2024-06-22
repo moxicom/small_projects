@@ -3,10 +3,8 @@ package elastic
 import (
 	"context"
 	"elastic/internal/pkg/models"
+	"encoding/json"
 	"fmt"
-	"reflect"
-
-	"github.com/olivere/elastic/v7"
 )
 
 
@@ -24,80 +22,53 @@ func (e *Elastic) InsertProduct(ctx context.Context, id string, jsonBody []byte)
 	return nil
 }
 
-// func (e *Elastic) UpdateProduct(ctx context.Context, prod models.Product) error {
-// 	update := map[string]interface{}{
-// 		"doc": prod,
-// 	}
+func (e *Elastic) UpdateProduct(ctx context.Context, prodID string, product models.Product) error {
+	_, err := e.client.Update().
+		Index(e.Indexes.Product).
+		Id(prodID).
+		Doc(product).
+		Do(ctx)
+	if err != nil {
+		return fmt.Errorf("error during product update: %s", err.Error())
+	}
+	return nil
+}
 
-// 	data, err := json.Marshal(update)
-// 	if err != nil {
-// 		return fmt.Errorf("%s : %w", ErrMarshal, err)
-// 	}
+func (e *Elastic) DeleteProduct(ctx context.Context, prodID string) error {
+	_, err := e.client.Delete().
+		Index(e.Indexes.Product).
+		Id(prodID).
+		Do(ctx)
+	if err != nil {
+		return fmt.Errorf("error during product delete: %s", err.Error())
+	}
+	return nil
+}
 
-// 	id := strconv.Itoa(prod.ID)
+func (e *Elastic) FindManyProducts(ctx context.Context, searchString string) ([]models.Product, error) {
+	// limit := 10
 
-// 	req := esapi.UpdateRequest{
-// 		Index:      e.Indexes.Product,
-// 		DocumentID: id,
-// 		Body:       bytes.NewReader(data),
-// 	}
+	q := makeProductSearchQuery(searchString)
 
-// 	res, err := req.Do(ctx, e.client)
-// 	if err != nil {
-// 		return fmt.Errorf("cannot update document: %w", err)
-// 	}
-// 	defer res.Body.Close()
+	searchResult, err := e.client.Search().
+		Index(e.Indexes.Product).
+		Query(q).
+		Do(context.TODO())
+	if err != nil {
+		return []models.Product{}, err
+	}
 
-// 	if res.IsError() {
-// 		return fmt.Errorf("error in updating document response: %s", res.String())
-// 	}
-
-// 	return nil
-// }
-
-// func (e *Elastic) DeleteProduct(ctx context.Context, prodID int) error {
-// 	id := strconv.Itoa(prodID)
-
-// 	req := esapi.DeleteRequest{
-// 		Index:      e.Indexes.Product,
-// 		DocumentID: id,
-// 		Refresh:    "true",
-// 	}
-
-// 	res, err := req.Do(ctx, e.client)
-// 	if err != nil {
-// 		return fmt.Errorf("cannot delete document: %w", err)
-// 	}
-// 	defer res.Body.Close()
-
-// 	if res.IsError() {
-// 		return fmt.Errorf("error in deleting document response: %s", res.String())
-// 	}
-
-// 	return nil
-// }
-
-func (e *Elastic) FindManyProducts(ctx context.Context, searchStr string) ([]models.Product, error) {
-	limit := 10
-	esQueryTest := []string{"*"}
-	for _, query := range esQueryTest {
-		fmt.Println("query test:", query)
-		searchResult, err := e.client.Search().
-			Index(e.Indexes.Product).
-			Query(elastic.NewQueryStringQuery(query)).
-			Size(limit).
-			Sort("last_attend", false).
-			Do(context.TODO())
-		if err != nil {
-			return []models.Product{}, err
-		}
-
-		var ttyp map[string]interface{}
-		for _, item := range searchResult.Each(reflect.TypeOf(ttyp)) {
-			if t, ok := item.(map[string]interface{}); ok {
-				fmt.Println(t)
+	if searchResult.Hits.TotalHits.Value != 0 {
+		products := make([]models.Product, searchResult.Hits.TotalHits.Value)
+		for i, hit := range searchResult.Hits.Hits {
+			var product models.Product
+			err := json.Unmarshal(hit.Source, &product)
+			if err != nil {
+				return []models.Product{}, err
 			}
+			products[i] = product
 		}
+		return products, nil
 	}
 
 	return []models.Product{}, nil 

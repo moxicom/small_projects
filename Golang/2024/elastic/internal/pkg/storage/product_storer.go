@@ -8,7 +8,7 @@ import (
 type ProductStorer interface {
 	// InitIndexes(indexes elastic.Indexes) error
 	InsertProduct(ctx context.Context, id string, jsonBody []byte) error
-	// UpdateProduct(ctx context.Context, prod models.Product) error
+	UpdateProduct(ctx context.Context, prodID string, product models.Product) error
 	// DeleteProduct(ctx context.Context, prodID int) error
 	FindManyProducts(ctx context.Context, searchStr string) ([]models.Product, error)
 

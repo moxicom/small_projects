@@ -28,9 +28,10 @@ func (s *Service) InsertProduct(ctx context.Context, prod models.Product) error 
 	return s.Storage.InsertProduct(ctx, id, jsonBody)
 }
 
-// func (s *Service) UpdateProduct(ctx context.Context, prod models.Product) error {
-// 	return s.Storage.UpdateProduct(ctx, prod)
-// }
+func (s *Service) UpdateProduct(ctx context.Context, prod models.Product) error {
+	id := strconv.Itoa(prod.ID)
+	return s.Storage.UpdateProduct(ctx, id, prod)
+}
 
 // func (s *Service) DeleteProduct(ctx context.Context, prodID int) error {
 // 	return s.Storage.DeleteProduct(ctx, prodID)
