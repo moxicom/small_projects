@@ -2,14 +2,12 @@ package elastic
 
 import (
 	"context"
-	"elastic/internal/pkg/models"
+	"elastic/internal/models"
 	"fmt"
 	"log"
 
 	"github.com/olivere/elastic/v7"
 )
-
-const aliasPostfix = "_alias"
 
 type Indexes struct {
 	Category string

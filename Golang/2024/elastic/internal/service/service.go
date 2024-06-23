@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"elastic/internal/pkg/models"
-	"elastic/internal/pkg/storage"
+	"elastic/internal/models"
+	"elastic/internal/storage"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -33,9 +33,10 @@ func (s *Service) UpdateProduct(ctx context.Context, prod models.Product) error 
 	return s.Storage.UpdateProduct(ctx, id, prod)
 }
 
-// func (s *Service) DeleteProduct(ctx context.Context, prodID int) error {
-// 	return s.Storage.DeleteProduct(ctx, prodID)
-// }
+func (s *Service) DeleteProduct(ctx context.Context, prodID int) error {
+	id := strconv.Itoa(prodID)
+	return s.Storage.DeleteProduct(ctx, id)
+}
 
 func (s *Service) SearchProduct(ctx context.Context, searchStr string) ([]models.Product, error) {
 	return s.Storage.FindManyProducts(ctx, searchStr)

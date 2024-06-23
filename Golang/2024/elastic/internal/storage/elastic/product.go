@@ -2,7 +2,7 @@ package elastic
 
 import (
 	"context"
-	"elastic/internal/pkg/models"
+	"elastic/internal/models"
 	"encoding/json"
 	"fmt"
 )
@@ -46,30 +46,31 @@ func (e *Elastic) DeleteProduct(ctx context.Context, prodID string) error {
 }
 
 func (e *Elastic) FindManyProducts(ctx context.Context, searchString string) ([]models.Product, error) {
-	// limit := 10
+	limit := 30
 
 	q := makeProductSearchQuery(searchString)
 
 	searchResult, err := e.client.Search().
 		Index(e.Indexes.Product).
 		Query(q).
+		Size(limit).
 		Do(context.TODO())
 	if err != nil {
 		return []models.Product{}, err
 	}
 
 	if searchResult.Hits.TotalHits.Value != 0 {
-		products := make([]models.Product, searchResult.Hits.TotalHits.Value)
-		for i, hit := range searchResult.Hits.Hits {
+		products := []models.Product{}
+		for _, hit := range searchResult.Hits.Hits {
 			var product models.Product
 			err := json.Unmarshal(hit.Source, &product)
 			if err != nil {
 				return []models.Product{}, err
 			}
-			products[i] = product
+			product.Name += fmt.Sprintf("%f", *hit.Score)
+			products = append(products, product)
 		}
 		return products, nil
 	}
-
 	return []models.Product{}, nil 
 }

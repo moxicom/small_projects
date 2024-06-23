@@ -2,7 +2,9 @@ version: "3.7"
 
 services:
   elasticsearch:
-    image: elasticsearch:7.9.2
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -12,7 +14,7 @@ services:
       - elk-network
 
   kibana:
-    image: kibana:7.9.2
+    image: kibana:7.16.3
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200

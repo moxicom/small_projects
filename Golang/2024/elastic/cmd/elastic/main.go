@@ -2,10 +2,24 @@ package main
 
 import (
 	"context"
-	"elastic/internal/pkg/storage/elastic"
+	"elastic/internal/handlers"
+	"elastic/internal/models"
+	"elastic/internal/server"
 	"elastic/internal/service"
+	"elastic/internal/storage/elastic"
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 )
+
+// using https://github.com/nickyat/elasticsearch-analysis-morphology/releases
+
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
 
 func main() {
 	e, err := elastic.New(
@@ -22,66 +36,39 @@ func main() {
 
 	service := service.New(e)
 
-	// err = service.InsertProduct(context.TODO(), models.Product{
-	// 	ID:    3,
-	// 	Name:  "Products",
-	// 	Price: 12,
-	// 	Properties: []models.Property{
-	// 		{
-	// 			Title: "Описание",
-	// 			Desc:  "Отличный огнетуш",
-	// 		},
-	// 		{
-	// 			 Title: "Size",
-	// 			 Desc: "123x12",
-	// 		},
-	// 	},
-	// })
+	// TEST INPUT DATA
+	jsonFile, err := os.Open("products.json")
+	check(err)
+	defer jsonFile.Close()
 
-	// _, err = service.SearchProduct(context.TODO(), "qe")
+	byteVal, _ := io.ReadAll(jsonFile)
 
-	//service.UpdateProduct(context.TODO(), models.Product{
-	//	ID:    1,
-	//	Price: 122,
-	//	Properties: []models.Proprty{
-	//		models.Proprty{
-	//			Title: "Descr",
-	//			Desc:  "fixed",
-	//		},
-	//	},
-	//	Name: "Fixed name",
-	//})
-
-	// service.DeleteProduct(context.TODO(), 1)
-
-	products, err := service.SearchProduct(context.Background(), "пеный")
-	
-	// err = service.UpdateProduct(context.Background(),
-	// models.Product{
-	// 		ID:    3,
-	// 		Name:  "Products Updated V2",
-	// 		Price: 12,
-	// 		Properties: []models.Property{
-	// 			{
-	// 				Title: "Описание",
-	// 				Desc:  "Прекрасный пенный огнетушитель",
-	// 			},
-	// 			{
-	// 				 Title: "Size",
-	// 				 Desc: "123x12",
-	// 			},
-	// 		},
-	// 	},
-	// )
+	var data models.InputData
+	err = json.Unmarshal(byteVal, &data)
 	if err != nil {
+		fmt.Println("Ошибка при распаковке JSON:", err)
+		return
+	}
+	prodID := 0
+	for categoryID, val := range data.Data {
+		for _, product := range val.Category.Products {
+			prod := models.Product {
+				ID: prodID,
+				CategoryID: categoryID,
+				Name: product.ProdName,
+			}
+			prodID++
+			service.InsertProduct(context.TODO(), prod)
+		}
+	}
+
+	//
+
+	handlers := handlers.New(service)
+
+	server := server.NewServer()
+
+	if err := server.Run("8080", handlers.InitRoutes()); err != nil {
 		panic(err)
 	}
-
-	for _, prod := range products {
-		fmt.Println(prod)
-	}
-
-	// Todo Init API layer
-
-	// Todo run app
 }
